@@ -8,8 +8,18 @@ interface Props {
   startTime: string;
 }
 
-function formatUnit(value: number) {
-  return value.toString().padStart(2, "0");
+function formatTime(seconds: number) {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  const parts: string[] = [];
+
+  if (hrs > 0) parts.push(`${hrs}h`);
+  if (mins > 0 || hrs > 0) parts.push(`${mins}m`);
+  parts.push(`${secs}s`);
+
+  return parts.join(" ");
 }
 
 function CountdownTimer({ startTime }: Props) {
@@ -21,15 +31,7 @@ function CountdownTimer({ startTime }: Props) {
     return <Text style={styles.live}>LIVE</Text>;
   }
 
-  const hours = Math.floor(remaining / 3600);
-  const minutes = Math.floor((remaining % 3600) / 60);
-  const seconds = remaining % 60;
-
-  return (
-    <Text style={styles.timer}>
-      {formatUnit(hours)}:{formatUnit(minutes)}:{formatUnit(seconds)}
-    </Text>
-  );
+  return <Text style={styles.timer}>{formatTime(remaining)}</Text>;
 }
 
 export default memo(CountdownTimer);

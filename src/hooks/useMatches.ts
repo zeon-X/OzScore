@@ -1,7 +1,7 @@
+import { fetchMatches } from "@/api/matchApi";
 import { MatchListResponse } from "@/types/match";
+import { getDeviceTimezone } from "@/utils/time";
 import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
-import { fetchMatches } from "../api/matchApi";
-import { getDeviceTimezone } from "../utils/time";
 
 const PAGE_SIZE = 20;
 

@@ -14,29 +14,25 @@ function MatchCard({ match }: Props) {
 
   return (
     <View style={styles.card}>
-      {/* Tournament */}
-      <Text style={styles.tournament}>{match.tournament.name}</Text>
-
-      {/* Start Time */}
-      <Text style={styles.time}>
-        {startTime.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </Text>
-
-      {/* Teams */}
       <View style={styles.teamRow}>
         <TeamBlock name={match.homeTeam.name} logo={match.homeTeam.logo} />
 
-        <Text style={styles.vs}>VS</Text>
+        <View style={styles.centerBlock}>
+          <Text style={styles.tournament}>{match.tournament.name}</Text>
+
+          <Text style={styles.time}>
+            {startTime.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+
+          <View style={styles.countdownContainer}>
+            <CountdownTimer startTime={match.start_time} />
+          </View>
+        </View>
 
         <TeamBlock name={match.awayTeam.name} logo={match.awayTeam.logo} />
-      </View>
-
-      {/* Countdown */}
-      <View style={styles.countdownContainer}>
-        <CountdownTimer startTime={match.start_time} />
       </View>
     </View>
   );
@@ -55,7 +51,7 @@ const TeamBlock = ({ name, logo }: { name: string; logo: string | null }) => {
         <View style={styles.logoPlaceholder} />
       )}
 
-      <Text style={styles.teamName} numberOfLines={1}>
+      <Text style={styles.teamName} numberOfLines={2}>
         {name}
       </Text>
     </View>
@@ -67,23 +63,30 @@ export default memo(MatchCard);
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
-    marginHorizontal: 16,
-    marginVertical: 8,
-    padding: 16,
-    borderRadius: 14,
+    marginHorizontal: 12,
+    // marginVertical: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    // borderRadius: 10,
+    borderBottomColor: OzScoreTheme.divider,
+    borderBottomWidth: 1,
   },
 
   tournament: {
-    fontSize: 12,
+    fontSize: 11,
     color: Colors.textMuted,
-    marginBottom: 4,
+    marginBottom: 2,
+    textTransform: "uppercase",
+    fontWeight: "500",
   },
 
   time: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 38,
+    fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    lineHeight: 40,
+    color: Colors.text,
+    letterSpacing: -1,
   },
 
   teamRow: {
@@ -95,40 +98,41 @@ const styles = StyleSheet.create({
   teamBlock: {
     flex: 1,
     alignItems: "center",
+    maxWidth: "30%",
+  },
+
+  centerBlock: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+    minWidth: "40%",
   },
 
   logo: {
-    width: 40,
-    height: 40,
-    marginBottom: 6,
+    width: 34,
+    height: 34,
+    marginBottom: 8,
   },
 
   logoPlaceholder: {
-    width: 40,
-    height: 40,
-    marginBottom: 6,
-    borderRadius: 20,
-    backgroundColor: "#E5E7EB",
+    width: 34,
+    height: 34,
+    marginBottom: 8,
+    borderRadius: 17,
+    backgroundColor: OzScoreTheme.chipBackground,
   },
 
   teamName: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 10,
+    fontWeight: "400",
     textAlign: "center",
-  },
-
-  vs: {
-    marginHorizontal: 10,
-    fontWeight: "600",
-    fontSize: 14,
-    color: Colors.textMuted,
+    color: Colors.text,
   },
 
   countdownContainer: {
-    marginTop: 14,
+    marginTop: 0,
     alignItems: "center",
-    backgroundColor: OzScoreTheme.chipBackground,
-    paddingVertical: 6,
-    borderRadius: 8,
+    justifyContent: "center",
   },
 });

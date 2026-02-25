@@ -63,7 +63,7 @@ export default function MatchListScreen() {
         onEndReachedThreshold={0.3}
         onEndReached={handleEndReached}
         ListFooterComponent={footer}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
       />
     </SafeAreaView>
   );

@@ -64,6 +64,7 @@ export const OzScoreTheme = {
   chipText: '#445EE2',
   countdownBadge: '#EDF2FF',
   tipsBadge: '#A5B4FC', // Light purple-blue for the "Tips" icon
+  divider: '#E1E4E8',
 };
 
 
