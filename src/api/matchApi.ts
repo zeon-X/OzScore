@@ -6,6 +6,7 @@ import { api } from "./axios";
 export interface MatchListParams {
     timezone: string;
     status?: string;
+    todate?: string;
     tournament_ids?: string;
     limit?: number;
     offset?: number;

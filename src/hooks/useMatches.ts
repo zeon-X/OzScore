@@ -1,28 +1,30 @@
 import { fetchMatches } from "@/api/matchApi";
+import { PAGE_SIZE } from "@/constants/config";
 import { MatchListResponse } from "@/types/match";
+import { MatchQueryParams } from "@/types/query";
 import { getDeviceTimezone } from "@/utils/time";
 import { InfiniteData, useInfiniteQuery } from "@tanstack/react-query";
 
-const PAGE_SIZE = 20;
-
-export const useMatches = (tournamentIds?: string) => {
+export const useMatches = (filters: MatchQueryParams) => {
     return useInfiniteQuery<
         MatchListResponse,
         Error,
         InfiniteData<MatchListResponse>,
-        [string, string | undefined],
+        ["matches", MatchQueryParams],
         number
     >({
-        queryKey: ["matches", tournamentIds],
+        queryKey: ["matches", filters],
 
-        queryFn: async ({ pageParam }) =>
-            fetchMatches({
+        queryFn: async ({ pageParam }) => {
+            return fetchMatches({
                 timezone: getDeviceTimezone(),
-                status: "all",
-                tournament_ids: tournamentIds,
+                status: filters.status,
+                todate: filters.todate,
+                tournament_ids: filters.tournamentIds?.join(","),
                 limit: PAGE_SIZE,
                 offset: pageParam,
-            }),
+            });
+        },
 
         initialPageParam: 0,
 
