@@ -62,7 +62,7 @@ export default memo(MatchCard);
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
     marginHorizontal: 12,
     // marginVertical: 6,
     paddingHorizontal: 14,
