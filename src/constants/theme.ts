@@ -43,6 +43,7 @@ export const Colors = {
   icon: '#687076',
   tabIconDefault: '#9BA1A6',
   tabIconSelected: brandPrimary,
+  headerBackground: "#323232",
   border: '#E1E4E8',
 
   // UI Specific

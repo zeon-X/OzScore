@@ -1,6 +1,7 @@
 import { Colors } from "@/constants/theme";
 import { useTournaments } from "@/hooks/useTournaments";
 import { useFilterStore } from "@/store/filterStore";
+import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import {
@@ -49,6 +50,8 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
       index={-1}
       snapPoints={snapPoints}
       enablePanDownToClose={true}
+      backgroundStyle={{ backgroundColor: "#888888" }}
+      handleIndicatorStyle={{ backgroundColor: Colors.background }}
     >
       <BottomSheetView style={styles.container}>
         <View style={styles.header}>
@@ -60,7 +63,8 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
 
         <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
           <View style={styles.resetRow}>
-            <TouchableOpacity onPress={resetFilters}>
+            <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
+              <MaterialIcons name="restart-alt" size={16} color={Colors.tint} />
               <Text style={styles.resetAllText}>Reset all</Text>
             </TouchableOpacity>
           </View>
@@ -157,8 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    height: 52,
-    backgroundColor: Colors.tabIconSelected,
+    height: 64,
+    backgroundColor: Colors.headerBackground,
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -168,7 +172,7 @@ const styles = StyleSheet.create({
     color: Colors.background,
     fontSize: 28,
     fontWeight: "700",
-    letterSpacing: 0.8,
+    letterSpacing: -1,
   },
   closeText: {
     color: Colors.textMuted,
@@ -181,6 +185,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 8,
+  },
+  resetButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   resetAllText: {
     color: Colors.tint,
