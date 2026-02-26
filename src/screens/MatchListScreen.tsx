@@ -27,13 +27,24 @@ export default function MatchListScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const formattedSelectedDate = useMemo(() => {
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDate.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, [selectedDate]);
+
   const openFilters = () => {
     bottomSheetRef.current?.expand();
   };
 
-  const filters = {
-    status: "all",
-  };
+  const filters = useMemo<MatchQueryParams>(
+    () => ({
+      status: "all",
+      todate: formattedSelectedDate,
+    }),
+    [formattedSelectedDate],
+  );
   const {
     data,
     fetchNextPage,
@@ -42,7 +53,7 @@ export default function MatchListScreen() {
     isLoading,
     isError,
     refetch,
-  } = useMatches(filters as MatchQueryParams);
+  } = useMatches(filters);
 
   // Flatten paginated data
   const matches = useMemo(() => {
@@ -86,19 +97,6 @@ export default function MatchListScreen() {
   const footer = isFetchingNextPage ? (
     <ActivityIndicator style={{ marginVertical: 16 }} />
   ) : null;
-
-  if (isLoading) return <LoadingView />;
-
-  if (isError)
-    return (
-      <EmptyView
-        title="Something went wrong"
-        buttonLabel="Retry"
-        onPress={refetch}
-      />
-    );
-
-  if (!matches.length) return <EmptyView title="No matches available" />;
 
   const monthNames = [
     "January",
@@ -211,16 +209,31 @@ export default function MatchListScreen() {
           </ScrollView>
         </View>
       </View>
-      <FlashList<Match>
-        data={matches}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        removeClippedSubviews
-        onEndReachedThreshold={0.3}
-        onEndReached={handleEndReached}
-        ListFooterComponent={footer}
-        showsVerticalScrollIndicator={true}
-      />
+
+      <View style={styles.listSection}>
+        {isLoading ? (
+          <LoadingView />
+        ) : isError ? (
+          <EmptyView
+            title="Something went wrong"
+            buttonLabel="Retry"
+            onPress={refetch}
+          />
+        ) : !matches.length ? (
+          <EmptyView title="No matches available" />
+        ) : (
+          <FlashList<Match>
+            data={matches}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderItem}
+            removeClippedSubviews
+            onEndReachedThreshold={0.3}
+            onEndReached={handleEndReached}
+            ListFooterComponent={footer}
+            showsVerticalScrollIndicator={true}
+          />
+        )}
+      </View>
       <FilterBottomSheet ref={bottomSheetRef} />
     </SafeAreaView>
   );
@@ -230,6 +243,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  listSection: {
+    flex: 1,
   },
   querySection: {},
   dateSection: {
