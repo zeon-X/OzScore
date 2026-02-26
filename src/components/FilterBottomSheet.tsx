@@ -5,6 +5,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { forwardRef, useEffect, useMemo, useState } from "react";
 import {
+  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,13 +22,34 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
   const [expandedSportIds, setExpandedSportIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const snapPoints = useMemo(() => ["90%"], []);
+  // const [headerHeight, setHeaderHeight] = useState(0);
+  const [resetHeight, setResetHeight] = useState(0);
+  const [actionsHeight, setActionsHeight] = useState(0);
+
+  const [scrollHeight, setScrollHeight] = useState(0);
+
+  const snapPoints = useMemo(() => ["94%"], []);
+
+  const fallbackContainerHeight = useMemo(
+    () => Dimensions.get("window").height * 0.94,
+    [],
+  );
 
   useEffect(() => {
     if (data?.length) {
       setExpandedSportIds([data[0].id]);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (!resetHeight || !actionsHeight) {
+      return;
+    }
+
+    setScrollHeight(
+      Math.max(fallbackContainerHeight - (resetHeight + actionsHeight), 0),
+    );
+  }, [fallbackContainerHeight, resetHeight, actionsHeight]);
 
   const closeSheet = () => {
     if (!ref || typeof ref === "function") {
@@ -56,14 +78,20 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
       // style={{ flex: 1, borderWidth: 1, borderColor: "red" }}
     >
       <BottomSheetView style={styles.container}>
-        <View style={styles.header}>
+        <View
+          style={styles.header}
+          // onLayout={(event) => setHeaderHeight(event.nativeEvent.layout.height)}
+        >
           <Text style={styles.headerTitle}>FILTERS</Text>
           <TouchableOpacity onPress={closeSheet}>
-            <Text style={styles.closeText}>✕</Text>
+            <MaterialIcons name="close" size={20} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.resetRow}>
+        <View
+          style={styles.resetRow}
+          onLayout={(event) => setResetHeight(event.nativeEvent.layout.height)}
+        >
           <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
             <MaterialIcons name="restart-alt" size={16} color={Colors.tint} />
             <Text style={styles.resetAllText}>Reset all</Text>
@@ -71,77 +99,104 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
         </View>
 
         <ScrollView
-          style={styles.scroll}
+          style={[styles.scroll, { height: scrollHeight }]}
           contentContainerStyle={[
             styles.scrollContent,
             { paddingBottom: 74 + Math.max(insets.bottom, 10) },
           ]}
           showsVerticalScrollIndicator={false}
         >
-          {data?.map((sport: any) => (
-            <View key={sport.id} style={styles.sportCard}>
-              <TouchableOpacity
-                style={styles.sportHeaderRow}
-                onPress={() => toggleSportExpand(sport.id)}
-              >
-                <View style={styles.sportLeftRow}>
-                  <Text style={styles.chevron}>
-                    {expandedSportIds.includes(sport.id) ? "⌃" : "⌄"}
-                  </Text>
-                  <Text style={styles.sportTitle}>{sport.sportName}</Text>
-                </View>
-                <View style={styles.selectedBadge}>
-                  <Text style={styles.selectedBadgeText}>
+          {data?.map((sport: any) => {
+            // console.log(sport);
+
+            return (
+              <View key={sport.id} style={styles.sportCard}>
+                <TouchableOpacity
+                  style={styles.sportHeaderRow}
+                  onPress={() => toggleSportExpand(sport.id)}
+                >
+                  <View style={styles.sportLeftRow}>
+                    <MaterialIcons
+                      name={
+                        expandedSportIds.includes(sport.id)
+                          ? "expand-less"
+                          : "expand-more"
+                      }
+                      size={18}
+                      color={Colors.textMuted}
+                    />
+                    <Text style={styles.sportTitle}>{sport.sportName}</Text>
+                  </View>
+                  <View style={styles.selectedBadge}>
                     {sport.tournaments.every((t: any) =>
                       tournamentIds.includes(t.id),
-                    )
-                      ? "✓"
-                      : ""}
-                  </Text>
-                </View>
-              </TouchableOpacity>
+                    ) ? (
+                      <MaterialIcons
+                        name="check"
+                        size={12}
+                        color={Colors.background}
+                      />
+                    ) : null}
+                  </View>
+                </TouchableOpacity>
 
-              {expandedSportIds.includes(sport.id) ? (
-                <View style={styles.expandedContent}>
-                  <TextInput
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    placeholder="Search"
-                    placeholderTextColor={Colors.textMuted}
-                    style={styles.searchInput}
-                  />
+                {expandedSportIds.includes(sport.id) ? (
+                  <View style={styles.expandedContent}>
+                    <View style={styles.searchRow}>
+                      <MaterialIcons
+                        name="search"
+                        size={18}
+                        color={Colors.textMuted}
+                      />
+                      <TextInput
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholder="Search"
+                        placeholderTextColor={Colors.textMuted}
+                        style={styles.searchInput}
+                      />
+                    </View>
 
-                  {sport.tournaments
-                    .filter((t: any) =>
-                      t.name
-                        .toLowerCase()
-                        .includes(searchQuery.trim().toLowerCase()),
-                    )
-                    .map((t: any) => {
-                      const selected = tournamentIds.includes(t.id);
+                    {sport.tournaments
+                      .filter((t: any) =>
+                        t.name
+                          .toLowerCase()
+                          .includes(searchQuery.trim().toLowerCase()),
+                      )
+                      .map((t: any) => {
+                        const selected = tournamentIds.includes(t.id);
 
-                      return (
-                        <TouchableOpacity
-                          key={t.id}
-                          style={styles.tournamentRow}
-                          onPress={() => toggleTournament(t.id)}
-                        >
-                          <Text style={styles.tournamentText}>{t.name}</Text>
-                          <View
-                            style={[
-                              styles.tournamentCheck,
-                              selected && styles.tournamentCheckSelected,
-                            ]}
+                        // console.log(t);
+
+                        return (
+                          <TouchableOpacity
+                            key={t.id}
+                            style={styles.tournamentRow}
+                            onPress={() => toggleTournament(t.id)}
                           >
-                            <Text style={styles.tournamentCheckText}>✓</Text>
-                          </View>
-                        </TouchableOpacity>
-                      );
-                    })}
-                </View>
-              ) : null}
-            </View>
-          ))}
+                            <Text style={styles.tournamentText}>{t.name}</Text>
+                            <View
+                              style={[
+                                styles.tournamentCheck,
+                                selected && styles.tournamentCheckSelected,
+                              ]}
+                            >
+                              {selected ? (
+                                <MaterialIcons
+                                  name="check"
+                                  size={12}
+                                  color={Colors.background}
+                                />
+                              ) : null}
+                            </View>
+                          </TouchableOpacity>
+                        );
+                      })}
+                  </View>
+                ) : null}
+              </View>
+            );
+          })}
         </ScrollView>
 
         <View
@@ -149,6 +204,9 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
             styles.actions,
             { paddingBottom: Math.max(insets.bottom, 10) },
           ]}
+          onLayout={(event) =>
+            setActionsHeight(event.nativeEvent.layout.height)
+          }
         >
           <TouchableOpacity style={styles.apply} onPress={closeSheet}>
             <Text style={styles.applyText}>Apply</Text>
@@ -167,9 +225,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-
-    // borderWidth: 1,
-    // borderColor: "red",
   },
   header: {
     height: 64,
@@ -212,7 +267,6 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     paddingHorizontal: 8,
-    height: 600,
     paddingTop: 8,
   },
   scrollContent: {
@@ -220,8 +274,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sportCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 8,
+    backgroundColor: "#E0DFE9",
+    borderRadius: 6,
     overflow: "hidden",
     borderWidth: 1,
     borderColor: Colors.border,
@@ -231,16 +285,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingVertical: 14,
   },
   sportLeftRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-  },
-  chevron: {
-    color: Colors.textMuted,
-    fontSize: 14,
   },
   sportTitle: {
     color: Colors.text,
@@ -263,19 +313,27 @@ const styles = StyleSheet.create({
   expandedContent: {
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    paddingBottom: 4,
+    // padding: 2,
   },
   searchInput: {
-    height: 36,
+    flex: 1,
+    height: 40,
+    paddingHorizontal: 6,
+    color: Colors.text,
+  },
+  searchRow: {
+    height: 40,
     marginHorizontal: 10,
     marginBottom: 8,
-    marginTop: 2,
+    marginTop: 6,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: 6,
     backgroundColor: Colors.background,
-    paddingHorizontal: 10,
-    color: Colors.text,
+    paddingHorizontal: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   tournamentRow: {
     flexDirection: "row",
@@ -285,7 +343,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
   },
   tournamentText: {
     color: Colors.text,
@@ -304,11 +362,6 @@ const styles = StyleSheet.create({
   tournamentCheckSelected: {
     backgroundColor: Colors.tint,
     borderColor: Colors.tint,
-  },
-  tournamentCheckText: {
-    color: Colors.background,
-    fontSize: 11,
-    fontWeight: "700",
   },
   actions: {
     position: "absolute",
