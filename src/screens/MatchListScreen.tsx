@@ -118,95 +118,99 @@ export default function MatchListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Date Calendar Strip */}
-      <View style={styles.dateSection}>
-        <Text style={styles.monthYear}>
-          {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()} ▼
-        </Text>
-        <View style={styles.datesRow}>
-          {weekDates.map((date, index) => {
-            const isSelected =
-              date.toDateString() === selectedDate.toDateString();
-            return (
-              <TouchableOpacity
-                key={index}
-                style={styles.dateItem}
-                onPress={() => setSelectedDate(date)}
-              >
-                <Text style={styles.dayName}>{dayNames[date.getDay()]}</Text>
-                <View
-                  style={[
-                    styles.dateCircle,
-                    isSelected && styles.dateCircleSelected,
-                  ]}
+      <View style={styles.querySection}>
+        {/* Date Calendar Strip */}
+        <View style={styles.dateSection}>
+          <Text style={styles.monthYear}>
+            {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()} ▼
+          </Text>
+          <View style={styles.datesRow}>
+            {weekDates.map((date, index) => {
+              const isSelected =
+                date.toDateString() === selectedDate.toDateString();
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.dateItem}
+                  onPress={() => setSelectedDate(date)}
                 >
-                  <Text
+                  <Text style={styles.dayName}>{dayNames[date.getDay()]}</Text>
+                  <View
                     style={[
-                      styles.dateText,
-                      isSelected && styles.dateTextSelected,
+                      styles.dateCircle,
+                      isSelected && styles.dateCircleSelected,
                     ]}
                   >
-                    {date.getDate()}
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+                    <Text
+                      style={[
+                        styles.dateText,
+                        isSelected && styles.dateTextSelected,
+                      ]}
+                    >
+                      {date.getDate()}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
-      </View>
 
-      {/* Filter Chips Row */}
-      <View style={styles.filterSection}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filtersScrollContent}
-        >
-          <TouchableOpacity style={styles.filtersButton} onPress={openFilters}>
-            <Text style={styles.filtersButtonText}>Filters</Text>
-            <Text style={styles.filterIcon}>≡</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.filterChip,
-              tournamentIds.length === 0 && styles.filterChipActive,
-            ]}
-            onPress={() => {
-              // Clear all tournament filters
-              selectedTournaments.forEach((t: any) => toggleTournament(t.id));
-            }}
+        {/* Filter Chips Row */}
+        <View style={styles.filterSection}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filtersScrollContent}
           >
-            <Text
-              style={[
-                styles.filterChipText,
-                tournamentIds.length === 0 && styles.filterChipTextActive,
-              ]}
-            >
-              All
-            </Text>
-            {tournamentIds.length === 0 && (
-              <Text style={styles.checkmark}>✓</Text>
-            )}
-          </TouchableOpacity>
-
-          {selectedTournaments.map((tournament: any) => (
             <TouchableOpacity
-              key={tournament.id}
-              style={[styles.filterChip, styles.filterChipActive]}
-              onPress={() => toggleTournament(tournament.id)}
+              style={styles.filtersButton}
+              onPress={openFilters}
+            >
+              <Text style={styles.filtersButtonText}>Filters</Text>
+              <Text style={styles.filterIcon}>≡</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.filterChip,
+                tournamentIds.length === 0 && styles.filterChipActive,
+              ]}
+              onPress={() => {
+                // Clear all tournament filters
+                selectedTournaments.forEach((t: any) => toggleTournament(t.id));
+              }}
             >
               <Text
-                style={[styles.filterChipText, styles.filterChipTextActive]}
+                style={[
+                  styles.filterChipText,
+                  tournamentIds.length === 0 && styles.filterChipTextActive,
+                ]}
               >
-                {tournament.name}
+                All
               </Text>
-              <Text style={styles.checkmark}>✓</Text>
+              {tournamentIds.length === 0 && (
+                <Text style={styles.checkmark}>✓</Text>
+              )}
             </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
 
+            {selectedTournaments.map((tournament: any) => (
+              <TouchableOpacity
+                key={tournament.id}
+                style={[styles.filterChip, styles.filterChipActive]}
+                onPress={() => toggleTournament(tournament.id)}
+              >
+                <Text
+                  style={[styles.filterChipText, styles.filterChipTextActive]}
+                >
+                  {tournament.name}
+                </Text>
+                <Text style={styles.checkmark}>✓</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      </View>
       <FlashList<Match>
         data={matches}
         keyExtractor={(item) => item.id.toString()}
@@ -227,6 +231,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  querySection: {},
   dateSection: {
     paddingHorizontal: 16,
     paddingVertical: 12,
