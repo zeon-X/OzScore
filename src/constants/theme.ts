@@ -31,7 +31,7 @@ import { Platform } from 'react-native';
 // Professional Brand Palette extracted from OzScore Logo
 const brandPrimary = '#1A2B56';   // Deep Navy (from "Oz")
 const brandSecondary = '#4CAF50'; // Sporty Green (from "Score")
-const brandAccent = '#3D5AFE';    // Action Blue (from the "Apply" button in UI)
+const brandAccent = '#4555C7';    // Action Blue (from the "Apply" button in UI)
 const surfaceGray = '#F5F7FA';    // Light background for cards/list
 
 export const Colors = {

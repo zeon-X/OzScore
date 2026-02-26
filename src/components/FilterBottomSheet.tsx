@@ -12,15 +12,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
   const { data } = useTournaments();
   const { tournamentIds, toggleTournament, resetFilters } = useFilterStore();
+  const insets = useSafeAreaInsets();
   const [expandedSportIds, setExpandedSportIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const snapPoints = useMemo(() => ["90%", "70%", "40%"], []);
+  const snapPoints = useMemo(() => ["90%"], []);
 
   useEffect(() => {
     if (data?.length) {
@@ -52,6 +53,7 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
       enablePanDownToClose={true}
       backgroundStyle={{ backgroundColor: "#888888" }}
       handleIndicatorStyle={{ backgroundColor: Colors.background }}
+      // style={{ flex: 1, borderWidth: 1, borderColor: "red" }}
     >
       <BottomSheetView style={styles.container}>
         <View style={styles.header}>
@@ -61,91 +63,97 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
           </TouchableOpacity>
         </View>
 
-        <SafeAreaView style={styles.safeArea} edges={["bottom"]}>
-          <View style={styles.resetRow}>
-            <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
-              <MaterialIcons name="restart-alt" size={16} color={Colors.tint} />
-              <Text style={styles.resetAllText}>Reset all</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.resetRow}>
+          <TouchableOpacity style={styles.resetButton} onPress={resetFilters}>
+            <MaterialIcons name="restart-alt" size={16} color={Colors.tint} />
+            <Text style={styles.resetAllText}>Reset all</Text>
+          </TouchableOpacity>
+        </View>
 
-          <ScrollView
-            style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {data?.map((sport: any) => (
-              <View key={sport.id} style={styles.sportCard}>
-                <TouchableOpacity
-                  style={styles.sportHeaderRow}
-                  onPress={() => toggleSportExpand(sport.id)}
-                >
-                  <View style={styles.sportLeftRow}>
-                    <Text style={styles.chevron}>
-                      {expandedSportIds.includes(sport.id) ? "⌃" : "⌄"}
-                    </Text>
-                    <Text style={styles.sportTitle}>{sport.sportName}</Text>
-                  </View>
-                  <View style={styles.selectedBadge}>
-                    <Text style={styles.selectedBadgeText}>
-                      {sport.tournaments.every((t: any) =>
-                        tournamentIds.includes(t.id),
-                      )
-                        ? "✓"
-                        : ""}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: 74 + Math.max(insets.bottom, 10) },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
+          {data?.map((sport: any) => (
+            <View key={sport.id} style={styles.sportCard}>
+              <TouchableOpacity
+                style={styles.sportHeaderRow}
+                onPress={() => toggleSportExpand(sport.id)}
+              >
+                <View style={styles.sportLeftRow}>
+                  <Text style={styles.chevron}>
+                    {expandedSportIds.includes(sport.id) ? "⌃" : "⌄"}
+                  </Text>
+                  <Text style={styles.sportTitle}>{sport.sportName}</Text>
+                </View>
+                <View style={styles.selectedBadge}>
+                  <Text style={styles.selectedBadgeText}>
+                    {sport.tournaments.every((t: any) =>
+                      tournamentIds.includes(t.id),
+                    )
+                      ? "✓"
+                      : ""}
+                  </Text>
+                </View>
+              </TouchableOpacity>
 
-                {expandedSportIds.includes(sport.id) ? (
-                  <View style={styles.expandedContent}>
-                    <TextInput
-                      value={searchQuery}
-                      onChangeText={setSearchQuery}
-                      placeholder="Search"
-                      placeholderTextColor={Colors.textMuted}
-                      style={styles.searchInput}
-                    />
+              {expandedSportIds.includes(sport.id) ? (
+                <View style={styles.expandedContent}>
+                  <TextInput
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    placeholder="Search"
+                    placeholderTextColor={Colors.textMuted}
+                    style={styles.searchInput}
+                  />
 
-                    {sport.tournaments
-                      .filter((t: any) =>
-                        t.name
-                          .toLowerCase()
-                          .includes(searchQuery.trim().toLowerCase()),
-                      )
-                      .map((t: any) => {
-                        const selected = tournamentIds.includes(t.id);
+                  {sport.tournaments
+                    .filter((t: any) =>
+                      t.name
+                        .toLowerCase()
+                        .includes(searchQuery.trim().toLowerCase()),
+                    )
+                    .map((t: any) => {
+                      const selected = tournamentIds.includes(t.id);
 
-                        return (
-                          <TouchableOpacity
-                            key={t.id}
-                            style={styles.tournamentRow}
-                            onPress={() => toggleTournament(t.id)}
+                      return (
+                        <TouchableOpacity
+                          key={t.id}
+                          style={styles.tournamentRow}
+                          onPress={() => toggleTournament(t.id)}
+                        >
+                          <Text style={styles.tournamentText}>{t.name}</Text>
+                          <View
+                            style={[
+                              styles.tournamentCheck,
+                              selected && styles.tournamentCheckSelected,
+                            ]}
                           >
-                            <Text style={styles.tournamentText}>{t.name}</Text>
-                            <View
-                              style={[
-                                styles.tournamentCheck,
-                                selected && styles.tournamentCheckSelected,
-                              ]}
-                            >
-                              <Text style={styles.tournamentCheckText}>✓</Text>
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
-                  </View>
-                ) : null}
-              </View>
-            ))}
-          </ScrollView>
+                            <Text style={styles.tournamentCheckText}>✓</Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                </View>
+              ) : null}
+            </View>
+          ))}
+        </ScrollView>
 
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.apply} onPress={closeSheet}>
-              <Text style={styles.applyText}>Apply</Text>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
+        <View
+          style={[
+            styles.actions,
+            { paddingBottom: Math.max(insets.bottom, 10) },
+          ]}
+        >
+          <TouchableOpacity style={styles.apply} onPress={closeSheet}>
+            <Text style={styles.applyText}>Apply</Text>
+          </TouchableOpacity>
+        </View>
       </BottomSheetView>
     </BottomSheet>
   );
@@ -159,6 +167,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+
+    // borderWidth: 1,
+    // borderColor: "red",
   },
   header: {
     height: 64,
@@ -179,12 +190,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
   },
-  safeArea: { flex: 1 },
+
   resetRow: {
     alignItems: "flex-end",
     paddingHorizontal: 12,
     paddingTop: 10,
     paddingBottom: 8,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   resetButton: {
     flexDirection: "row",
@@ -194,10 +207,13 @@ const styles = StyleSheet.create({
   resetAllText: {
     color: Colors.tint,
     fontWeight: "600",
+    textDecorationLine: "underline",
   },
   scroll: {
     flex: 1,
     paddingHorizontal: 8,
+    height: 600,
+    paddingTop: 8,
   },
   scrollContent: {
     paddingBottom: 10,
@@ -295,13 +311,19 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   actions: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
     paddingHorizontal: 12,
     paddingTop: 8,
-    paddingBottom: 10,
+    backgroundColor: Colors.background,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
   },
   apply: {
     alignItems: "center",
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     backgroundColor: Colors.button,
   },
