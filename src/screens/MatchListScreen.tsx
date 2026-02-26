@@ -8,6 +8,7 @@ import { useTournaments } from "@/hooks/useTournaments";
 import { useFilterStore } from "@/store/filterStore";
 import { Match } from "@/types/match";
 import { MatchQueryParams } from "@/types/query";
+import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback, useMemo, useRef, useState } from "react";
@@ -154,7 +155,7 @@ export default function MatchListScreen() {
               onPress={openFilters}
             >
               <Text style={styles.filtersButtonText}>Filters</Text>
-              <Text style={styles.filterIcon}>≡</Text>
+              <MaterialIcons name="tune" size={16} color={Colors.text} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -176,7 +177,9 @@ export default function MatchListScreen() {
                 All
               </Text>
               {tournamentIds.length === 0 && (
-                <Text style={styles.checkmark}>✓</Text>
+                <View style={styles.chipIconWrap}>
+                  <MaterialIcons name="close" size={12} color={Colors.tint} />
+                </View>
               )}
             </TouchableOpacity>
 
@@ -191,7 +194,9 @@ export default function MatchListScreen() {
                 >
                   {tournament.name}
                 </Text>
-                <Text style={styles.checkmark}>✓</Text>
+                <View style={styles.chipIconWrap}>
+                  <MaterialIcons name="close" size={12} color={Colors.tint} />
+                </View>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -300,10 +305,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.text,
   },
-  filterIcon: {
-    fontSize: 16,
-    color: Colors.text,
-  },
   filterChip: {
     flexDirection: "row",
     alignItems: "center",
@@ -327,9 +328,12 @@ const styles = StyleSheet.create({
   filterChipTextActive: {
     color: Colors.background,
   },
-  checkmark: {
-    fontSize: 12,
-    color: Colors.background,
-    fontWeight: "700",
+  chipIconWrap: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.background,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
