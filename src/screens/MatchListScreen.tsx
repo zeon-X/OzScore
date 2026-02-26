@@ -20,6 +20,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import DateSelectDropdown from "../components/DateSelectDropdown";
 
 export default function MatchListScreen() {
   const { tournamentIds, toggleTournament } = useFilterStore();
@@ -98,20 +99,6 @@ export default function MatchListScreen() {
     <ActivityIndicator style={{ marginVertical: 16 }} />
   ) : null;
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
   const dayNames = ["Su", "M", "Tu", "W", "Th", "F", "Sa"];
 
   return (
@@ -119,9 +106,10 @@ export default function MatchListScreen() {
       <View style={styles.querySection}>
         {/* Date Calendar Strip */}
         <View style={styles.dateSection}>
-          <Text style={styles.monthYear}>
-            {monthNames[selectedDate.getMonth()]} {selectedDate.getFullYear()} ▼
-          </Text>
+          <DateSelectDropdown
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
           <View style={styles.datesRow}>
             {weekDates.map((date, index) => {
               const isSelected =
@@ -254,13 +242,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
-  },
-  monthYear: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.text,
-    textAlign: "center",
-    marginBottom: 12,
   },
   datesRow: {
     flexDirection: "row",
