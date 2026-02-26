@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   listSection: {
     flex: 1,
   },
-  querySection: {},
+  querySection: { borderBottomWidth: 6, borderBottomColor: Colors.border },
   dateSection: {
     paddingHorizontal: 16,
     paddingVertical: 12,

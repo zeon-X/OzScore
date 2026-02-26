@@ -1,7 +1,6 @@
 import { OzScoreTheme } from "@/constants/theme";
 import { useGlobalClock } from "@/hooks/useGlobalClock";
-import { differenceInSeconds } from "date-fns";
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { StyleSheet, Text } from "react-native";
 
 interface Props {
@@ -24,8 +23,9 @@ function formatTime(seconds: number) {
 
 function CountdownTimer({ startTime }: Props) {
   const now = useGlobalClock();
+  const targetTime = useMemo(() => new Date(startTime).getTime(), [startTime]);
 
-  const remaining = differenceInSeconds(new Date(startTime), new Date(now));
+  const remaining = Math.floor((targetTime - now) / 1000);
 
   if (remaining <= 0) {
     return <Text style={styles.live}>LIVE</Text>;
