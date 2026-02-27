@@ -1,6 +1,6 @@
 # OzScore Match List
 
-![OzScore App Logo](assets/images/icon.png)
+<img src="assets/images/icon.png" alt="OzScore App Logo" width="72" height="72" />
 
 OzScore Match List is a React Native application built with Expo Router that demonstrates a production-grade sports match listing experience with infinite scrolling, live countdown timers, timezone-aware time display, and apply-based tournament filtering.
 
@@ -46,7 +46,13 @@ npm run start
 
 ### APK
 
-`OzScore.apk` is included here: **[https://expo.dev/accounts/gozeonx/projects/ozscore-digiground/builds/a3afc2e3-0b88-479e-a381-bf93d0422968]**
+`OzScore.apk` is included here: **[Download APK](https://expo.dev/accounts/gozeonx/projects/ozscore-digiground/builds/a3afc2e3-0b88-479e-a381-bf93d0422968)**
+
+[Open Expo Build Link](https://expo.dev/accounts/gozeonx/projects/ozscore-digiground/builds/a3afc2e3-0b88-479e-a381-bf93d0422968)
+
+Scan QR to open the APK link:
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https%3A%2F%2Fexpo.dev%2Faccounts%2Fgozeonx%2Fprojects%2Fozscore-digiground%2Fbuilds%2Fa3afc2e3-0b88-479e-a381-bf93d0422968" alt="APK QR Code" width="180" height="180" />
 
 ## Architecture Overview
 
