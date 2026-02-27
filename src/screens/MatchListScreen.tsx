@@ -28,14 +28,41 @@ export default function MatchListScreen() {
   const { tournamentIds, setTournamentIds } = useFilterStore();
   const { data: tournamentsData } = useTournaments();
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [calendarDate, setCalendarDate] = useState(new Date());
+  const [selectedDateFilter, setSelectedDateFilter] = useState<Date | null>(
+    new Date(),
+  );
+  const [isAllStatusSelected, setIsAllStatusSelected] = useState(true);
 
   const formattedSelectedDate = useMemo(() => {
-    const year = selectedDate.getFullYear();
-    const month = String(selectedDate.getMonth() + 1).padStart(2, "0");
-    const day = String(selectedDate.getDate()).padStart(2, "0");
+    if (!selectedDateFilter) {
+      return undefined;
+    }
+
+    const year = selectedDateFilter.getFullYear();
+    const month = String(selectedDateFilter.getMonth() + 1).padStart(2, "0");
+    const day = String(selectedDateFilter.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
-  }, [selectedDate]);
+  }, [selectedDateFilter]);
+
+  const handleDateChangeFromPicker = (date: Date) => {
+    setCalendarDate(date);
+    setSelectedDateFilter(date);
+  };
+
+  const toggleDateFilter = (date: Date) => {
+    const isAlreadySelected =
+      selectedDateFilter?.toDateString() === date.toDateString();
+
+    setCalendarDate(date);
+
+    if (isAlreadySelected) {
+      setSelectedDateFilter(null);
+      return;
+    }
+
+    setSelectedDateFilter(date);
+  };
 
   const openFilters = () => {
     bottomSheetRef.current?.expand();
@@ -43,11 +70,11 @@ export default function MatchListScreen() {
 
   const filters = useMemo<MatchQueryParams>(
     () => ({
-      status: "all",
+      status: isAllStatusSelected ? "all" : undefined,
       todate: formattedSelectedDate,
       tournamentIds,
     }),
-    [formattedSelectedDate, tournamentIds],
+    [formattedSelectedDate, isAllStatusSelected, tournamentIds],
   );
   const {
     data,
@@ -67,8 +94,8 @@ export default function MatchListScreen() {
   // Get week dates around selected date
   const weekDates = useMemo(() => {
     const dates = [];
-    const startOfWeek = new Date(selectedDate);
-    startOfWeek.setDate(selectedDate.getDate() - 3);
+    const startOfWeek = new Date(calendarDate);
+    startOfWeek.setDate(calendarDate.getDate() - 3);
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(startOfWeek);
@@ -76,7 +103,7 @@ export default function MatchListScreen() {
       dates.push(date);
     }
     return dates;
-  }, [selectedDate]);
+  }, [calendarDate]);
 
   // Get selected tournament names
   const selectedTournaments = useMemo(() => {
@@ -113,18 +140,18 @@ export default function MatchListScreen() {
         {/* Date Calendar Strip */}
         <View style={styles.dateSection}>
           <DateSelectDropdown
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
+            selectedDate={calendarDate}
+            onDateChange={handleDateChangeFromPicker}
           />
           <View style={styles.datesRow}>
             {weekDates.map((date, index) => {
               const isSelected =
-                date.toDateString() === selectedDate.toDateString();
+                selectedDateFilter?.toDateString() === date.toDateString();
               return (
                 <TouchableOpacity
                   key={index}
                   style={styles.dateItem}
-                  onPress={() => setSelectedDate(date)}
+                  onPress={() => toggleDateFilter(date)}
                 >
                   <Text style={styles.dayName}>{dayNames[date.getDay()]}</Text>
                   <View
@@ -166,19 +193,19 @@ export default function MatchListScreen() {
             <TouchableOpacity
               style={[
                 styles.filterChip,
-                tournamentIds.length === 0 && styles.filterChipActive,
+                isAllStatusSelected && styles.filterChipActive,
               ]}
-              onPress={() => setTournamentIds([])}
+              onPress={() => setIsAllStatusSelected((prev) => !prev)}
             >
               <Text
                 style={[
                   styles.filterChipText,
-                  tournamentIds.length === 0 && styles.filterChipTextActive,
+                  isAllStatusSelected && styles.filterChipTextActive,
                 ]}
               >
                 All
               </Text>
-              {tournamentIds.length === 0 && (
+              {isAllStatusSelected && (
                 <View style={styles.chipIconWrap}>
                   <MaterialIcons name="close" size={12} color={Colors.tint} />
                 </View>
