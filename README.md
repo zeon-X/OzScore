@@ -31,7 +31,12 @@ OzScore Match List is a React Native application built with Expo Router that dem
 
 ## How to Run the Project
 
-Repository: [https://github.com/zeon-X/OzScore](https://github.com/zeon-X/OzScore)
+Clone the repository:
+
+```bash
+git clone https://github.com/zeon-X/OzScore
+cd OzScore
+```
 
 ```bash
 npm install
