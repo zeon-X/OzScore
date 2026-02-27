@@ -107,7 +107,10 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
           // onLayout={(event) => setHeaderHeight(event.nativeEvent.layout.height)}
         >
           <Text style={styles.headerTitle}>FILTERS</Text>
-          <TouchableOpacity onPress={closeSheet}>
+          <TouchableOpacity
+            onPress={closeSheet}
+            style={{ paddingHorizontal: 12 }}
+          >
             <MaterialIcons name="close" size={20} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
@@ -260,9 +263,8 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: Colors.background,
-    fontSize: 28,
-    fontWeight: "700",
-    letterSpacing: -1,
+    fontSize: 44,
+    fontFamily: "BebasNeue_400Regular",
   },
   closeText: {
     color: Colors.textMuted,

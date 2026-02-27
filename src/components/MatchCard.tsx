@@ -21,10 +21,12 @@ function MatchCard({ match }: Props) {
           <Text style={styles.tournament}>{match.tournament.name}</Text>
 
           <Text style={styles.time}>
-            {startTime.toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
+            {startTime
+              .toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              .replace(/\s/g, "")}
           </Text>
 
           <View style={styles.countdownContainer}>
@@ -81,12 +83,11 @@ const styles = StyleSheet.create({
   },
 
   time: {
-    fontSize: 38,
-    fontWeight: "700",
+    fontSize: 44,
+    fontFamily: "BebasNeue_400Regular",
     textAlign: "center",
-    lineHeight: 40,
+
     color: Colors.text,
-    letterSpacing: -1,
   },
 
   teamRow: {
