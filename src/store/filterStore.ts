@@ -8,6 +8,7 @@ interface FilterState {
 
     setStatus: (status?: MatchStatus) => void;
     setToDate: (date?: string) => void;
+    setTournamentIds: (ids: number[]) => void;
     toggleTournament: (id: number) => void;
     resetFilters: () => void;
 }
@@ -20,6 +21,8 @@ export const useFilterStore = create<FilterState>((set) => ({
     setStatus: (status) => set({ status }),
 
     setToDate: (todate) => set({ todate }),
+
+    setTournamentIds: (tournamentIds) => set({ tournamentIds }),
 
     toggleTournament: (id) =>
         set((state) => ({

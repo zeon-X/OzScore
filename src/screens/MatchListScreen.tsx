@@ -8,6 +8,7 @@ import { useTournaments } from "@/hooks/useTournaments";
 import { useFilterStore } from "@/store/filterStore";
 import { Match } from "@/types/match";
 import { MatchQueryParams } from "@/types/query";
+import { LeagueTournament, SportLeague } from "@/types/sport";
 import { MaterialIcons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { FlashList } from "@shopify/flash-list";
@@ -24,7 +25,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DateSelectDropdown from "../components/DateSelectDropdown";
 
 export default function MatchListScreen() {
-  const { tournamentIds, toggleTournament } = useFilterStore();
+  const { tournamentIds, setTournamentIds } = useFilterStore();
   const { data: tournamentsData } = useTournaments();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -44,8 +45,9 @@ export default function MatchListScreen() {
     () => ({
       status: "all",
       todate: formattedSelectedDate,
+      tournamentIds,
     }),
-    [formattedSelectedDate],
+    [formattedSelectedDate, tournamentIds],
   );
   const {
     data,
@@ -79,10 +81,13 @@ export default function MatchListScreen() {
   // Get selected tournament names
   const selectedTournaments = useMemo(() => {
     if (!tournamentsData) return [];
-    const allTournaments = tournamentsData.flatMap((sport: any) =>
-      sport.tournaments.map((t: any) => ({ id: t.id, name: t.name })),
+    const allTournaments = tournamentsData.flatMap((sport: SportLeague) =>
+      sport.tournaments.map((t: LeagueTournament) => ({
+        id: t.id,
+        name: t.name,
+      })),
     );
-    return allTournaments.filter((t: any) => tournamentIds.includes(t.id));
+    return allTournaments.filter((t) => tournamentIds.includes(t.id));
   }, [tournamentsData, tournamentIds]);
 
   const renderItem = useCallback(
@@ -163,10 +168,7 @@ export default function MatchListScreen() {
                 styles.filterChip,
                 tournamentIds.length === 0 && styles.filterChipActive,
               ]}
-              onPress={() => {
-                // Clear all tournament filters
-                selectedTournaments.forEach((t: any) => toggleTournament(t.id));
-              }}
+              onPress={() => setTournamentIds([])}
             >
               <Text
                 style={[
@@ -183,11 +185,15 @@ export default function MatchListScreen() {
               )}
             </TouchableOpacity>
 
-            {selectedTournaments.map((tournament: any) => (
+            {selectedTournaments.map((tournament) => (
               <TouchableOpacity
                 key={tournament.id}
                 style={[styles.filterChip, styles.filterChipActive]}
-                onPress={() => toggleTournament(tournament.id)}
+                onPress={() =>
+                  setTournamentIds(
+                    tournamentIds.filter((id) => id !== tournament.id),
+                  )
+                }
               >
                 <Text
                   style={[styles.filterChipText, styles.filterChipTextActive]}

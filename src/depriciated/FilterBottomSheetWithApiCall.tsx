@@ -20,8 +20,15 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
   const { tournamentIds, setTournamentIds } = useFilterStore();
   const insets = useSafeAreaInsets();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const { data } = useTournaments();
+  const [searchBySportId, setSearchBySportId] = useState<
+    Record<number, string>
+  >({});
+
+  const { data } = useTournaments({
+    search: searchBySportId,
+    limit: 20,
+    offset: 0,
+  });
 
   const [draftTournamentIds, setDraftTournamentIds] = useState<number[]>([]);
   const [expandedSportIds, setExpandedSportIds] = useState<number[]>([]);
@@ -75,6 +82,14 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
     );
   };
 
+  const updateSearch = (sportId: number, value: string) => {
+    setSearchBySportId((prev) => ({
+      ...prev,
+      [sportId]: value,
+    }));
+  };
+  console.log(searchBySportId);
+
   const toggleDraftTournament = (id: number) => {
     setDraftTournamentIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
@@ -83,7 +98,7 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
 
   const resetDraftFilters = () => {
     setDraftTournamentIds([]);
-    setSearchQuery("");
+    setSearchBySportId({});
   };
 
   const applyFilters = () => {
@@ -134,6 +149,8 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
           showsVerticalScrollIndicator={false}
         >
           {data?.map((sport: SportLeague) => {
+            // console.log(sport);
+
             return (
               <View key={sport.id} style={styles.sportCard}>
                 <TouchableOpacity
@@ -175,47 +192,41 @@ const FilterBottomSheet = forwardRef<BottomSheet>((_, ref) => {
                         color={Colors.textMuted}
                       />
                       <TextInput
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
+                        value={searchBySportId[sport.id] ?? ""}
+                        onChangeText={(value) => updateSearch(sport.id, value)}
                         placeholder="Search"
                         placeholderTextColor={Colors.textMuted}
                         style={styles.searchInput}
                       />
                     </View>
 
-                    {sport.tournaments
-                      .filter((t: LeagueTournament) =>
-                        t.name
-                          .toLowerCase()
-                          .includes(searchQuery.trim().toLowerCase()),
-                      )
-                      .map((t: LeagueTournament) => {
-                        const selected = draftTournamentIds.includes(t.id);
+                    {sport.tournaments.map((t: LeagueTournament) => {
+                      const selected = draftTournamentIds.includes(t.id);
 
-                        return (
-                          <TouchableOpacity
-                            key={t.id}
-                            style={styles.tournamentRow}
-                            onPress={() => toggleDraftTournament(t.id)}
+                      return (
+                        <TouchableOpacity
+                          key={t.id}
+                          style={styles.tournamentRow}
+                          onPress={() => toggleDraftTournament(t.id)}
+                        >
+                          <Text style={styles.tournamentText}>{t.name}</Text>
+                          <View
+                            style={[
+                              styles.tournamentCheck,
+                              selected && styles.tournamentCheckSelected,
+                            ]}
                           >
-                            <Text style={styles.tournamentText}>{t.name}</Text>
-                            <View
-                              style={[
-                                styles.tournamentCheck,
-                                selected && styles.tournamentCheckSelected,
-                              ]}
-                            >
-                              {selected ? (
-                                <MaterialIcons
-                                  name="check"
-                                  size={12}
-                                  color={Colors.background}
-                                />
-                              ) : null}
-                            </View>
-                          </TouchableOpacity>
-                        );
-                      })}
+                            {selected ? (
+                              <MaterialIcons
+                                name="check"
+                                size={12}
+                                color={Colors.background}
+                              />
+                            ) : null}
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 ) : null}
               </View>
