@@ -13,14 +13,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        // "backgroundColor": "#E6F4FE",
         "backgroundColor": "#1A2B56",
         "foregroundImage": "./assets/images/android-icon-foreground.png"
-        // "backgroundImage": "./assets/images/android-icon-background.png",
-        // "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.gozeonx.ozscoredigiground"
     },
     "web": {
       "output": "static",
@@ -34,7 +32,6 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          // "backgroundColor": "#ffffff",
           "backgroundColor": "#1A2B56",
           "dark": {
             "backgroundColor": "#000000"
@@ -45,6 +42,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c0526624-02b7-47cb-9381-fc0d9e607c81"
+      }
+    },
+    "owner": "gozeonx"
   }
 }
