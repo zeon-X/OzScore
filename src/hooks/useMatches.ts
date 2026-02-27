@@ -16,13 +16,15 @@ export const useMatches = (filters: MatchQueryParams) => {
         queryKey: ["matches", filters],
 
         queryFn: async ({ pageParam }) => {
+            const tournamentIds = filters.tournamentIds?.join(",");
+
             return fetchMatches({
                 timezone: getDeviceTimezone(),
-                status: filters.status,
-                todate: filters.todate,
-                tournament_ids: filters.tournamentIds?.join(","),
                 limit: PAGE_SIZE,
                 offset: pageParam,
+                ...(filters.status ? { status: filters.status } : {}),
+                ...(filters.todate ? { todate: filters.todate } : {}),
+                ...(tournamentIds ? { tournament_ids: tournamentIds } : {}),
             });
         },
 

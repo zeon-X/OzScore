@@ -1,6 +1,8 @@
 import { Colors } from "@/constants/theme";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Animated,
+  Easing,
   ScrollView,
   StyleSheet,
   Text,
@@ -35,10 +37,12 @@ export default function DateSelectDropdown({
   onDateChange,
 }: DateSelectDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [shouldRenderDropdown, setShouldRenderDropdown] = useState(false);
   const [activeSelect, setActiveSelect] = useState<ActiveSelect>(null);
   const [tempYear, setTempYear] = useState(selectedDate.getFullYear());
   const [tempMonth, setTempMonth] = useState(selectedDate.getMonth());
   const [tempDay, setTempDay] = useState(selectedDate.getDate());
+  const dropdownAnimation = useRef(new Animated.Value(0)).current;
 
   const yearRange = useMemo(() => {
     const startYear = 2025;
@@ -97,6 +101,34 @@ export default function DateSelectDropdown({
     setActiveSelect(null);
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRenderDropdown(true);
+      Animated.timing(dropdownAnimation, {
+        toValue: 1,
+        duration: 220,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start();
+      return;
+    }
+
+    if (!shouldRenderDropdown) {
+      return;
+    }
+
+    Animated.timing(dropdownAnimation, {
+      toValue: 0,
+      duration: 180,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) {
+        setShouldRenderDropdown(false);
+      }
+    });
+  }, [dropdownAnimation, isOpen, shouldRenderDropdown]);
+
   return (
     <>
       <TouchableOpacity style={styles.monthYear} onPress={openDatePicker}>
@@ -105,8 +137,30 @@ export default function DateSelectDropdown({
         </Text>
       </TouchableOpacity>
 
-      {isOpen ? (
-        <View style={styles.dropdownCard}>
+      {shouldRenderDropdown ? (
+        <Animated.View
+          style={[
+            styles.dropdownCard,
+            {
+              opacity: dropdownAnimation,
+              transform: [
+                {
+                  translateY: dropdownAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-8, 0],
+                  }),
+                },
+                {
+                  scale: dropdownAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.98, 1],
+                  }),
+                },
+              ],
+            },
+          ]}
+          pointerEvents={isOpen ? "auto" : "none"}
+        >
           <View style={styles.selectRow}>
             <View style={styles.selectField}>
               <Text style={styles.dropdownLabel}>Year</Text>
@@ -238,7 +292,7 @@ export default function DateSelectDropdown({
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </Animated.View>
       ) : null}
     </>
   );
@@ -264,6 +318,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     gap: 10,
     marginBottom: 16,
+
+    zIndex: 20,
   },
   dropdownLabel: {
     fontSize: 12,
@@ -311,7 +367,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   optionsList: {
-    maxHeight: 160,
+    maxHeight: 136,
   },
   optionRow: {
     paddingVertical: 10,
