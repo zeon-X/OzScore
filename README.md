@@ -1,6 +1,6 @@
 # OzScore Match List
 
-<img src="assets/images/text-icon.png" alt="OzScore App Logo" width="240" height="80" />
+<img src="assets/images/text-icon.png" alt="OzScore App Logo" width="180" height="80" />
 
 OzScore Match List is a React Native application built with Expo Router that demonstrates a production-grade sports match listing experience with infinite scrolling, live countdown timers, timezone-aware time display, and apply-based tournament filtering.
 
